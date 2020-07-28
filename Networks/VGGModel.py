@@ -13,9 +13,9 @@ class PerceptualModel(NNInterface):
         super().__init__(classes_num, input_size)
         vgg_conv = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(input_size[0], input_size[0], 3))
         vgg_conv.summary()
-        #
-        # for layer in vgg_conv.layers[:]:
-        #     layer.trainable = False
+
+        for layer in vgg_conv.layers[:]:
+            layer.trainable = False
 
         self.__model = tf.keras.Sequential()
         self.__model.add(vgg_conv)
@@ -37,11 +37,11 @@ class PerceptualModel(NNInterface):
     def compute_output_shape(self, input_shape):
         return self.__model.compute_output_shape(input_shape)
 
-    def freeze_layers(self, freeze_idx):
-
-        for i, layer in enumerate(self.__model.layers):
-            if freeze_idx > i:
-                layer.trainable = False
-
-        for i, layer in enumerate(self.__model.layers):
-            print("layer {} is trainable {}".format(layer.name, layer.trainable))
+    # def freeze_layers(self, freeze_idx):
+    #
+    #     for i, layer in enumerate(self.__model.layers):
+    #         if freeze_idx > i:
+    #             layer.trainable = False
+    #
+    #     for i, layer in enumerate(self.__model.layers):
+    #         print("layer {} is trainable {}".format(layer.name, layer.trainable))

@@ -13,7 +13,6 @@ def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output
     for i in range(max_iteration):
         batch_x, batch_y = dataloader.read_batch(batch_size, "train")
         trainstep(batch_x, batch_y)
-        print(i)
         if i % print_freq == 0:
             batch_x, batch_y = dataloader.read_batch(batch_size, "val")
             valstep(batch_x, batch_y)
@@ -46,6 +45,9 @@ class TrainLogger:
         self.logs["iteration"].append(iteration)
         self.logs["train_loss"].append(float(self.trainer.loss_logger.result()))
         self.logs["val_loss"].append(float(self.validator.loss_logger.result()))
+        print("iteration:{} - train loss : {}, val loss : {}".format(iteration,
+                                                                     float(self.trainer.loss_logger.result()),
+                                                                     float(self.validator.loss_logger.result())))
 
     def __del__(self):
         plot_dict(self.logs, "iteration", self.output_path)

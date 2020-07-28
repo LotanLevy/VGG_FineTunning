@@ -81,7 +81,7 @@ def main():
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.lr)
-    loss = tf.keras.losses.SparseCategoricalCrossentropy()
+    loss = tf.keras.losses.CategoricalCrossentropy()
     trainer = TrainTestHelper(network, optimizer, loss, training=True)
     validator = TrainTestHelper(network, optimizer, loss, training=False)
 

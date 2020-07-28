@@ -67,7 +67,7 @@ class DataLoader:
             self.labels_logger[mode].append(label)
             labels.append(label)
             b_idx += 1
-        return batch_images, np.arra(labels)
+        return batch_images, np.array(labels)
 
     def __del__(self):
         for mode in self.paths_logger:

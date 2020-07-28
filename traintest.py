@@ -12,7 +12,6 @@ def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output
     logger = TrainLogger(trainer, validator, output_path)
     print(iteration_for_epoch*epochs)
     for i in range(iteration_for_epoch*epochs):
-        print(i)
         batch_x, batch_y = dataloader.read_batch(batch_size, "train")
         trainstep(batch_x, batch_y)
         if i % print_freq == 0:
@@ -21,7 +20,7 @@ def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output
             logger.update(i)
 
         if i % iteration_for_epoch == 0:
-            model.save_model(int(i/epochs), output_path)
+            model.save_model(int(i), output_path)
 
 
 

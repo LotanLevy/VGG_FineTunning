@@ -4,6 +4,7 @@ import numpy as np
 import cv2
 from PIL import Image
 import tensorflow as tf
+import random
 import os
 from augmentationHelper import get_random_augment
 

@@ -43,9 +43,9 @@ class DataLoader:
 
         self.datasets = read_dataset_map(dataset_file)
 
-        unique_labels = np.unique(self.datasets[1])
-        new_labels = np.arange(0, len(unique_labels))
-        self.labels_map = dict(zip(unique_labels, new_labels))
+        # unique_labels = np.unique(self.datasets[1])
+        # new_labels = np.arange(0, len(unique_labels))
+        # self.labels_map = dict(zip(unique_labels, new_labels))
 
 
     def read_batch(self, batch_size):

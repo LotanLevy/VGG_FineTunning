@@ -6,7 +6,7 @@ import os
 
 
 def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output_path, model):
-    max_iteration = epochs * batch_size
+    max_iteration = dataloader.get_iterations_for_epoch(batch_size) * epochs
     trainstep = trainer.get_step()
     valstep = validator.get_step()
     logger = TrainLogger(trainer, validator, output_path)

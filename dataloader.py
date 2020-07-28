@@ -54,6 +54,10 @@ class DataLoader:
         new_labels = np.arange(0, len(unique_labels))
         self.labels_map = dict(zip(unique_labels, new_labels))
 
+    def get_iterations_for_epoch(self, batch_size):
+        train_samples = len(self.datasets["train"][0])
+        return int(train_samples/batch_size)
+
 
     def read_batch(self, batch_size, mode):
         all_paths, all_labels = self.datasets[mode]

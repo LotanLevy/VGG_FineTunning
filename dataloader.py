@@ -43,10 +43,6 @@ class DataLoader:
 
         self.datasets = read_dataset_map(dataset_file)
 
-        # unique_labels = np.unique(self.datasets[1])
-        # new_labels = np.arange(0, len(unique_labels))
-        # self.labels_map = dict(zip(unique_labels, new_labels))
-
 
     def read_batch(self, batch_size):
         all_paths, all_labels = self.datasets
@@ -54,15 +50,11 @@ class DataLoader:
 
         batch_labels = all_labels[rand_idx]
         batch_images = np.zeros((batch_size, self.input_size[0], self.input_size[1], 3))
-        # labels = []
         b_idx = 0
         for i in rand_idx:
             batch_images[b_idx, :, :, :] = read_image(all_paths[i], self.input_size)
-            label = all_labels[i]
-            # label = self.labels_map[all_labels[i]]
             self.paths_logger.append(all_paths[i])
-            self.labels_logger.append(label)
-            # labels.append(label)
+            self.labels_logger.append(all_labels[i])
             b_idx += 1
         return batch_images, batch_labels
 

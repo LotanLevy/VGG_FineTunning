@@ -28,6 +28,11 @@ class VGGModel(NNInterface):
 
         self.__model.summary()
 
+        if os.path.exists(self.get_last_ckpt_path()):
+            self.load_model(self.get_last_ckpt_path())
+            print("loads last weights")
+
+
 
 
     def call(self, x, training=True):
@@ -52,3 +57,11 @@ class VGGModel(NNInterface):
 
     def load_model(self, ckpt_path):
         self.__model.load_weights(ckpt_path)
+
+    def get_last_ckpt_path(self):
+        output_path = os.path.join(os.getcwd(), "last_ckpts")
+        return os.path.join(output_path, "ckpt")
+
+    def __del__(self):
+        self.__model.save_weights(self.get_last_ckpt_path())
+

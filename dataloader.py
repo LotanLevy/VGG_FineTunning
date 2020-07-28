@@ -52,7 +52,7 @@ class DataLoader:
         self.datasets = read_dataset_map(dataset_file, shuffle=True)
         unique_labels = np.unique(self.datasets[1])
 
-        assert len(unique_labels) == cls_num
+        # assert len(unique_labels) == cls_num
         new_labels = np.arange(0, len(unique_labels))
         self.labels_map = dict(zip(unique_labels, new_labels))
         print(self.labels_map)

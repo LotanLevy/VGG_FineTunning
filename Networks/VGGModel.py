@@ -45,7 +45,7 @@ class PerceptualModel(NNInterface):
 
         for i, layer in enumerate(self.__model.layers):
             if i == 0:
-                for layer in self.__model[0].layers[:]:
-                    print("layer {} is trainable {}".format(layer.name, layer.trainable))
+                for sub_layer in layer.layers[:]:
+                    print("layer {} is trainable {}".format(sub_layer.name, sub_layer.trainable))
             else:
                 print("layer {} is trainable {}".format(layer.name, layer.trainable))

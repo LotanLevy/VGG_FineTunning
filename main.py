@@ -7,29 +7,30 @@ from dataloader import DataLoader
 import nn_builder
 from Networks.TrainTestHelper import TrainTestHelper
 import argparse
+from traintest import train
 
 
 
 
-
-def train(dataloader, trainer, validator, batches, max_iteration, print_freq):
-    np.random.seed(1234)
-    tf.random.set_seed(1234)
-
-    trainstep = trainer.get_step()
-    valstep = validator.get_step()
-    train_dict = {"iteration":[], "loss": []}
-
-    for i in range(max_iteration):
-        batch_x, batch_y = dataloader.read_batch(batches, "train")
-        trainstep(batch_x, batch_y)
-        if i % print_freq == 0:  # validation loss
-            batch_x, batch_y = dataloader.read_batch(batches, "val")
-            valstep(batch_x, batch_y)
-
-            train_dict["iteration"].append(i)
-            train_dict["loss"].append(float(validator.loss_logger.result()))
-            print("iteration {} - loss {}".format(i + 1, train_dict["loss"][-1]))
+#
+# def train(dataloader, trainer, validator, batches, max_iteration, print_freq):
+#     np.random.seed(1234)
+#     tf.random.set_seed(1234)
+#
+#     trainstep = trainer.get_step()
+#     valstep = validator.get_step()
+#     train_dict = {"iteration":[], "loss": []}
+#
+#     for i in range(max_iteration):
+#         batch_x, batch_y = dataloader.read_batch(batches, "train")
+#         trainstep(batch_x, batch_y)
+#         if i % print_freq == 0:  # validation loss
+#             batch_x, batch_y = dataloader.read_batch(batches, "val")
+#             valstep(batch_x, batch_y)
+#
+#             train_dict["iteration"].append(i)
+#             train_dict["loss"].append(float(validator.loss_logger.result()))
+#             print("iteration {} - loss {}".format(i + 1, train_dict["loss"][-1]))
 
 
 def get_imagenet_prediction(image, hot_vec,  network, loss_func):
@@ -61,8 +62,12 @@ def get_args():
     parser.add_argument('--test_path', type=str, required=True)
     parser.add_argument('--output_path', type=str, default=os.getcwd(), help='The path to keep the output')
     parser.add_argument('--print_freq', '-pf', type=int, default=10)
-    parser.add_argument('--lr', type=float, default=5e-5, help='learning rate')
-    parser.add_argument('--batchs_num', '-bs', type=int, default=2, help='number of batches')
+    parser.add_argument('--learning_rate1', default=1e-3, type=float)
+    parser.add_argument('--learning_rate2', default=1e-5, type=float)
+
+
+    parser.add_argument('--num_epochs', default=10, type=int)
+    parser.add_argument('--batch_size', '-bs', type=int, default=32, help='number of batches')
     parser.add_argument('--train_iterations', '-iter', type=int, default=800, help='The maximum iterations for learning')
 
     return parser.parse_args()
@@ -86,8 +91,10 @@ def main():
     test_images, labels = dataloader.read_batch(200, "test")
     save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "before_training", args.output_path)
 
+    train(args.num_epochs, args.batch_size, trainer, validator, dataloader, args.print_freq, args.output_path, network)
 
-    train(dataloader, trainer, validator, args.batchs_num, args.train_iterations, args.print_freq)
+
+    # train(dataloader, trainer, validator, args.batchs_num, args.train_iterations, args.print_freq)
     save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "after_training", args.output_path)
 
 

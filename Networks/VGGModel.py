@@ -13,9 +13,9 @@ class PerceptualModel(NNInterface):
         super().__init__(classes_num, input_size)
         vgg_conv = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(input_size[0], input_size[0], 3))
         vgg_conv.summary()
-
-        for layer in vgg_conv.layers[:]:
-            layer.trainable = False
+        #
+        # for layer in vgg_conv.layers[:]:
+        #     layer.trainable = False
 
         self.__model = tf.keras.Sequential()
         self.__model.add(vgg_conv)

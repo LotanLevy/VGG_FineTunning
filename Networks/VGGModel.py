@@ -1,14 +1,14 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 from Networks.NNInterface import NNInterface
 from tensorflow.python.keras.applications import vgg16
-
+import os
 
 
 
 import tensorflow as tf
 
 
-class PerceptualModel(NNInterface):
+class VGGModel(NNInterface):
     def __init__(self, classes_num, input_size):
         super().__init__(classes_num, input_size)
         vgg_conv = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(input_size[0], input_size[0], 3))
@@ -38,14 +38,17 @@ class PerceptualModel(NNInterface):
         return self.__model.compute_output_shape(input_shape)
 
     def freeze_status(self):
-
-        # for i, layer in enumerate(self.__model.layers):
-        #     if freeze_idx > i:
-        #         layer.trainable = False
-
         for i, layer in enumerate(self.__model.layers):
             if i == 0:
                 for sub_layer in layer.layers[:]:
                     print("layer {} is trainable {}".format(sub_layer.name, sub_layer.trainable))
             else:
                 print("layer {} is trainable {}".format(layer.name, layer.trainable))
+
+    def save_model(self, iter_num, output_path):
+        output_path = os.path.join(output_path, "ckpts")
+        checkpoint_path = "weights_after_{}_iterations".format(iter_num)
+        self.__model.save_weights(os.path.join(output_path, checkpoint_path))
+
+    def load_model(self, ckpt_path):
+        self.__model.load_weights(ckpt_path)

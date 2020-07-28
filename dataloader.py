@@ -32,21 +32,23 @@ def read_dataset_map(data_map_path):
 
 class DataLoader:
 
-    def __init__(self, name, file, cls_num, input_size,
+    def __init__(self, name, train_file, val_file, test_file, cls_num, input_size,
                  output_path=os.getcwd()):
         self.classes_num = cls_num
         self.input_size = input_size
 
         self.name = name
         self.output_path = output_path
-        self.paths_logger = []
-        self.labels_logger = []
+        self.paths_logger = {"train": [], "val": [], "test": []}
+        self.labels_logger = {"train": [], "val": [], "test": []}
 
-        self.datasets = read_dataset_map(file)
+        self.datasets = {"train": read_dataset_map(train_file),
+                       "val": read_dataset_map(val_file),
+                       "test": read_dataset_map(test_file)}
 
 
-    def read_batch(self, batch_size):
-        all_paths, all_labels = self.datasets
+    def read_batch(self, batch_size, mode):
+        all_paths, all_labels = self.datasets[mode]
         rand_idx = np.random.randint(low=0, high=len(all_paths)-1, size=batch_size).astype(np.int)
 
         batch_labels = all_labels[rand_idx]
@@ -54,16 +56,16 @@ class DataLoader:
         b_idx = 0
         for i in rand_idx:
             batch_images[b_idx, :, :, :] = read_image(all_paths[i], self.input_size)
-            self.paths_logger.append(all_paths[i])
-            self.labels_logger.append(all_labels[i])
+            self.paths_logger[mode].append(all_paths[i])
+            self.labels_logger[mode].append(all_labels[i])
             b_idx += 1
         return batch_images, batch_labels
 
     def __del__(self):
-
-        with open(os.path.join(self.output_path, "{}_{}.txt".format(self.name, mode)), 'w') as f:
-            for i in range(len(self.paths_logger)):
-                f.write("{}{}{}".format(self.paths_logger[i], SPLIT_FACTOR, self.labels_logger[i]))
+        for mode in self.paths_logger:
+            with open(os.path.join(self.output_path, "{}_{}.txt".format(self.name, mode)), 'w') as f:
+                for i in range(len(self.paths_logger[mode])):
+                    f.write("{}{}{}".format(self.paths_logger[mode][i], SPLIT_FACTOR, self.labels_logger[mode][i]))
 
 
 

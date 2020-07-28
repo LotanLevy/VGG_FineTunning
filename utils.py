@@ -8,10 +8,10 @@ from Networks.NNInterface import NNInterface
 # ~~~~  Objects constructors by name   ~~~~#
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 
-def get_network(network_type):
+def get_network(network_type, classes_num, input_size):
     import Networks
     package = Networks
-    return get_object(network_type, package)
+    return get_object(network_type, package, classes_num, input_size)
 
 
 

@@ -9,10 +9,11 @@ import tensorflow as tf
 
 
 class PerceptualModel(NNInterface):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, classes_num, input_size):
+        super().__init__(classes_num, input_size)
         self.__model = vgg16.VGG16(weights='imagenet')
         self.__model.summary()
+
 
 
     def call(self, x, training=True):

@@ -58,7 +58,8 @@ class DataLoader:
         b_idx = 0
         for i in rand_idx:
             batch_images[b_idx, :, :, :] = read_image(all_paths[i], self.input_size)
-            label = self.labels_map[all_labels[i]]
+            label = all_labels[i]
+            # label = self.labels_map[all_labels[i]]
             self.paths_logger.append(all_paths[i])
             self.labels_logger.append(label)
             # labels.append(label)

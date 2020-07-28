@@ -68,7 +68,6 @@ def get_args():
 
     parser.add_argument('--num_epochs', default=10, type=int)
     parser.add_argument('--batch_size', '-bs', type=int, default=32, help='number of batches')
-    parser.add_argument('--train_iterations', '-iter', type=int, default=800, help='The maximum iterations for learning')
 
     return parser.parse_args()
 

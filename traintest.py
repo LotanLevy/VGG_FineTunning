@@ -37,17 +37,15 @@ def plot_dict(dict, x_key, output_path):
 
 class TrainLogger:
     def __init__(self, trainer, validator, output_path):
-        self.logs = {"iteration": [], "train_D_loss": [], "train_C_loss": [], "val_D_loss": [], "val_C_loss": []}
+        self.logs = {"iteration": [], "train_loss": [],  "val_loss": []}
         self.trainer = trainer
         self.validator = validator
         self.output_path = output_path
 
     def update(self, iteration):
         self.logs["iteration"].append(iteration)
-        self.logs["train_D_loss"].append(float(self.trainer.D_loss_mean.result()))
-        self.logs["train_C_loss"].append(float(self.trainer.C_loss_mean.result()))
-        self.logs["val_D_loss"].append(float(self.validator.D_loss_mean.result()))
-        self.logs["val_C_loss"].append(float(self.validator.C_loss_mean.result()))
+        self.logs["train_loss"].append(float(self.trainer.loss_logger.result()))
+        self.logs["val_loss"].append(float(self.validator.loss_logger.result()))
 
     def __del__(self):
         plot_dict(self.logs, "iteration", self.output_path)

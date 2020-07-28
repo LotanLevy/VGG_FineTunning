@@ -62,7 +62,7 @@ class DataLoader:
 
 
 
-    def read_batch_with_details(self, batch_size):
+    def read_batch(self, batch_size):
         all_paths, all_labels = self.datasets
 
         # takes the next batch, if it finish the epoch it'll start  new epoch
@@ -83,16 +83,18 @@ class DataLoader:
             batch_images[b_idx, :, :, :] = read_image(all_paths[i], self.input_size, augment=self.augment)
             paths.append(all_paths[i])
             labels.append(self.labels_map[all_labels[i]])
+            self.paths_logger.append(all_paths[i])
+            self.paths_logger.append(self.labels_map[all_labels[i]])
             b_idx += 1
 
         hot_vecs = tf.keras.utils.to_categorical(np.array(labels), num_classes=self.classes_num)
-        return batch_images, np.array(labels), paths, labels
+        return batch_images, np.array(labels)
 
-    def read_batch(self, batch_size):
-        batch_images, hot_vecs, paths, labels = self.read_batch_with_details(batch_size)
-        self.paths_logger += paths
-        self.labels_logger += labels
-        return batch_images, hot_vecs
+    # def read_batch(self, batch_size):
+    #     batch_images, hot_vecs, paths, labels = self.read_batch_with_details(batch_size)
+    #     self.paths_logger += paths
+    #     self.labels_logger += labels
+    #     return batch_images, hot_vecs
 
     def __del__(self):
         with open(os.path.join(self.output_path, "{}.txt".format(self.name)), 'w') as f:

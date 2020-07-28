@@ -6,12 +6,12 @@ import os
 
 
 def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output_path, model):
-    max_iteration = dataloader.get_iterations_for_epoch(batch_size) * epochs
+    iteration_for_epoch = dataloader.get_iterations_for_epoch(batch_size)
     trainstep = trainer.get_step()
     valstep = validator.get_step()
     logger = TrainLogger(trainer, validator, output_path)
-    print(max_iteration)
-    for i in range(max_iteration):
+    print(iteration_for_epoch*epochs)
+    for i in range(iteration_for_epoch*epochs):
         print(i)
         batch_x, batch_y = dataloader.read_batch(batch_size, "train")
         trainstep(batch_x, batch_y)
@@ -20,7 +20,7 @@ def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output
             valstep(batch_x, batch_y)
             logger.update(i)
 
-        if i % epochs == 0:
+        if i % iteration_for_epoch == 0:
             model.save_model(int(i/epochs), output_path)
 
 

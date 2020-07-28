@@ -59,6 +59,7 @@ class DataLoader:
         return batch_images, batch_labels
 
     def __del__(self):
+        
         with open(os.path.join(self.output_path, "{}.txt".format(self.name)), 'w') as f:
             for i in range(len(self.paths_logger)):
                 f.write("{}{}{}".format(self.paths_logger[i], SPLIT_FACTOR, self.labels_logger[i]))

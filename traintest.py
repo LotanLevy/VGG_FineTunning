@@ -10,7 +10,9 @@ def train(epochs, batch_size, trainer, validator, dataloader, print_freq, output
     trainstep = trainer.get_step()
     valstep = validator.get_step()
     logger = TrainLogger(trainer, validator, output_path)
+    print(max_iteration)
     for i in range(max_iteration):
+        print(i)
         batch_x, batch_y = dataloader.read_batch(batch_size, "train")
         trainstep(batch_x, batch_y)
         if i % print_freq == 0:

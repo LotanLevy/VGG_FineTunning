@@ -12,7 +12,7 @@ import argparse
 
 
 
-def train(dataloader, trainer, validator, batches, max_iteration, print_freq):
+def train(train_dataloader,val_dataloader,  trainer, validator, batches, max_iteration, print_freq):
     np.random.seed(1234)
     tf.random.set_seed(1234)
 
@@ -21,10 +21,10 @@ def train(dataloader, trainer, validator, batches, max_iteration, print_freq):
     train_dict = {"iteration":[], "loss": []}
 
     for i in range(max_iteration):
-        batch_x, batch_y = dataloader.read_batch(batches, "train")
+        batch_x, batch_y = train_dataloader.read_batch(batches)
         trainstep(batch_x, batch_y)
         if i % print_freq == 0:  # validation loss
-            batch_x, batch_y = dataloader.read_batch(batches, "val")
+            batch_x, batch_y = val_dataloader.read_batch(batches)
             valstep(batch_x, batch_y)
 
             train_dict["iteration"].append(i)
@@ -74,21 +74,23 @@ def main():
         os.makedirs(args.output_path)
 
 
-    dataloader = DataLoader(args.train_path, args.val_path, args.test_path, args.cls_num, args.input_size,
-                            name="dataloader", output_path=args.output_path)
+    train_dataloader = DataLoader("train_dataset", args.train_path, args.cls_num, args.input_size,
+                            output_path=args.output_path)
+    val_dataloader = DataLoader("val_dataset", args.val_path, args.cls_num, args.input_size,
+                            output_path=args.output_path)
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.lr)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
     trainer = TrainTestHelper(network, optimizer, loss, training=True)
     validator = TrainTestHelper(network, optimizer, loss, training=False)
+    #
+    # test_images, labels = dataloader.read_batch(200, "test")
+    # save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "before_training", args.output_path)
+    #
 
-    test_images, labels = dataloader.read_batch(200, "test")
-    save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "before_training", args.output_path)
-
-
-    train(dataloader, trainer, validator, args.batchs_num, args.train_iterations, args.print_freq)
-    save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "after_training", args.output_path)
+    train(train_dataloader, val_dataloader, trainer, validator, args.batchs_num, args.train_iterations, args.print_freq)
+    # save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "after_training", args.output_path)
 
 
 

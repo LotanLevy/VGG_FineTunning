@@ -5,18 +5,14 @@ import cv2
 from PIL import Image
 import tensorflow as tf
 import os
-from augmentationHelper import get_random_augment
-
 
 SPLIT_FACTOR = "$"
 
 
-def read_image(path, resize_image=(), augment=False):
+def read_image(path, resize_image=()):
     image = Image.open(path, 'r')
     if image.mode != 'RGB':
         image = image.convert('RGB')
-    if augment:
-        image = get_random_augment(image, resize_image)
     if len(resize_image) > 0:
         image = image.resize(resize_image, Image.NEAREST)
     image = np.array(image).astype(np.float32)

@@ -4,8 +4,8 @@ import numpy as np
 import tensorflow as tf
 import os
 from dataloader import DataLoader
-import utils
-from Networks.imagenet_traintest import TrainTestHelper
+import nn_builder
+from Networks.TrainTestHelper import TrainTestHelper
 import argparse
 
 
@@ -76,7 +76,7 @@ def main():
 
     dataloader = DataLoader(args.train_path, args.val_path, args.test_path, args.cls_num, args.input_size,
                             name="dataloader", output_path=args.output_path)
-    network = utils.get_network(args.nntype, args.cls_num, args.input_size)
+    network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.lr)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()

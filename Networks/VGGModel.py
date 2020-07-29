@@ -11,6 +11,7 @@ import tensorflow as tf
 class VGGModel(NNInterface):
     def __init__(self, classes_num, input_size):
         super().__init__(classes_num, input_size)
+        self.output_path = None
         vgg_conv = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(input_size[0], input_size[0], 3))
         vgg_conv.summary()
 
@@ -31,6 +32,9 @@ class VGGModel(NNInterface):
         if os.path.exists(self.get_last_ckpt_path()):
             self.load_model(self.get_last_ckpt_path())
             print("loads last weights")
+
+    def update_output_path(self, output_path):
+        self.output_path = output_path
 
 
 
@@ -59,7 +63,8 @@ class VGGModel(NNInterface):
         self.__model.load_weights(ckpt_path)
 
     def get_last_ckpt_path(self):
-        output_path = os.path.join(os.getcwd(), "last_ckpts")
+        output_path = os.getcwd() if self.output_path is None else self.output_path
+        output_path = os.path.join(output_path, "last_ckpts")
         return os.path.join(output_path, "ckpt")
 
     def __del__(self):

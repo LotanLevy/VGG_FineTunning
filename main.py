@@ -69,6 +69,9 @@ def get_args():
     parser.add_argument('--num_epochs', default=10, type=int)
     parser.add_argument('--batch_size', '-bs', type=int, default=32, help='number of batches')
 
+    parser.add_argument('--restart_dataloader_config', type=str, default=None)
+    parser.add_argument('--restart_model_path', type=str, default=None)
+
     return parser.parse_args()
 
 def main():
@@ -79,8 +82,11 @@ def main():
 
 
     dataloader = DataLoader("dataloader", args.train_path, args.val_path, args.test_path, args.cls_num, args.input_size,
-                            output_path=args.output_path)
+                            output_path=args.output_path, restart_config_path=args.restart_dataloader_config)
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
+    if args.restart_model_path is not None:
+        network.load_model(args.restart_model_path)
+
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate1)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()

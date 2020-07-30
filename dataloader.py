@@ -7,8 +7,14 @@ import tensorflow as tf
 from augmentationHelper import get_random_augment
 import random
 import os
+import re
 
 SPLIT_FACTOR = "$"
+
+def image_name(image_path):
+    regex = ".*[\\/|\\\](.*)[\\/|\\\](.*).jpg"
+    m = re.match(regex, image_path)
+    return m.group(1) + "_" + m.group(2)
 
 
 def read_image(path, resize_image=(), augment=False):
@@ -35,9 +41,9 @@ def read_dataset_map(data_map_path, shuffle=False):
     return images, np.array(labels).astype(np.int)
 
 
-def write_dataset_map(output_path, paths, labels):
+def write_dataset_map(output_path, dataset_name,  paths, labels):
     assert len(paths) == len(labels)
-    with open(os.path.join(output_path, 'last_dataset_order.txt'), 'w') as df:
+    with open(os.path.join(output_path, '{}.txt'.format(dataset_name)), 'w') as df:
         lines = ["{}{}{}\n".format(paths[i], SPLIT_FACTOR, labels[i]) for i in range(len(paths))]
         df.writelines(lines)
 
@@ -102,8 +108,10 @@ class DataLoader:
 
     def write_last_train_dataset_config(self):
         with open(os.path.join(self.output_path, 'last_train_config'), 'w') as df:
-            lines = ["{}{}{}{}{}".format(key, SPLIT_FACTOR, self.datasets[key], SPLIT_FACTOR, self.batches_idx[key])
-                     for key in self.datasets]
+            lines = []
+            for key in self.datasets:
+                dataset_path = os.path.join(self.output_path, '{}.txt'.format(key))
+                lines.append("{}{}{}{}{}".format(key, SPLIT_FACTOR, dataset_path, SPLIT_FACTOR, self.batches_idx[key]))
             df.writelines(lines)
 
     def get_iterations_for_epoch(self, batch_size):
@@ -140,6 +148,10 @@ class DataLoader:
             with open(os.path.join(self.output_path, "{}_{}.txt".format(self.name, mode)), 'w') as f:
                 for i in range(len(self.paths_logger[mode])):
                     f.write("{}{}{}".format(self.paths_logger[mode][i], SPLIT_FACTOR, self.labels_logger[mode][i]))
+
+        new_dir = os.path.join(self.output_path, "last_train_settings")
+        for key in self.datasets:
+            write_dataset_map(new_dir, key, self.datasets[key][0], self.datasets[key][1])
 
         self.write_last_train_dataset_config()
 

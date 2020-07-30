@@ -8,29 +8,9 @@ import nn_builder
 from Networks.TrainTestHelper import TrainTestHelper
 import argparse
 from traintest import train
+import random
 
 
-
-
-#
-# def train(dataloader, trainer, validator, batches, max_iteration, print_freq):
-#     np.random.seed(1234)
-#     tf.random.set_seed(1234)
-#
-#     trainstep = trainer.get_step()
-#     valstep = validator.get_step()
-#     train_dict = {"iteration":[], "loss": []}
-#
-#     for i in range(max_iteration):
-#         batch_x, batch_y = dataloader.read_batch(batches, "train")
-#         trainstep(batch_x, batch_y)
-#         if i % print_freq == 0:  # validation loss
-#             batch_x, batch_y = dataloader.read_batch(batches, "val")
-#             valstep(batch_x, batch_y)
-#
-#             train_dict["iteration"].append(i)
-#             train_dict["loss"].append(float(validator.loss_logger.result()))
-#             print("iteration {} - loss {}".format(i + 1, train_dict["loss"][-1]))
 
 
 def get_imagenet_prediction(image, hot_vec,  network, loss_func):
@@ -75,6 +55,10 @@ def get_args():
     return parser.parse_args()
 
 def main():
+    random.seed(1234)
+    np.random.seed(1234)
+    tf.random.set_seed(1234)
+
     tf.keras.backend.set_floatx('float32')
     args = get_args()
     if not os.path.exists(args.output_path):
@@ -86,6 +70,7 @@ def main():
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     if args.restart_model_path is not None:
         network.load_model(args.restart_model_path)
+    network.update_output_path(args.output_path)
 
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate1)

@@ -38,15 +38,15 @@ def main():
 
     counter = 0
     step = 32
-    while counter < args.test_size:
 
-        batch_x, batch_y = dataloader.read_batch(step, "test")
-        loss_func = tf.keras.losses.SparseCategoricalCrossentropy()
 
-        loss, accuracy = traintest.get_accuracy_and_loss(batch_x, batch_y, network, loss_func)
-        print("loss: {}, accuracy: {}".format(loss, accuracy))
+    batch_x, batch_y = dataloader.read_batch(step, "test")
+    loss_func = tf.keras.losses.SparseCategoricalCrossentropy()
 
-        counter += step
+    loss, accuracy = traintest.get_accuracy_and_loss(batch_x, batch_y, network, loss_func)
+    print("loss: {}, accuracy: {}".format(loss, accuracy))
+
+    counter += step
 
     hot_map_creator = traintest.HotMapHelper(network, args.input_size, loss_func)
     paths = dataloader.paths_logger
@@ -54,7 +54,7 @@ def main():
 
 
     for i in range(len(paths)):
-        hot_map_creator.test_with_square(paths[i], labels[i], args.kernel_size, args.stride, args.output_path)
+        hot_map_creator.test_with_square(paths["test"][i], labels["test"][i], args.kernel_size, args.stride, args.output_path)
 
 
 

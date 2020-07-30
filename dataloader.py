@@ -148,12 +148,12 @@ class DataLoader:
             with open(os.path.join(self.output_path, "{}_{}.txt".format(self.name, mode)), 'w') as f:
                 for i in range(len(self.paths_logger[mode])):
                     f.write("{}{}{}".format(self.paths_logger[mode][i], SPLIT_FACTOR, self.labels_logger[mode][i]))
-
-        new_dir = os.path.join(self.output_path, "last_train_settings")
-        for key in self.datasets:
-            write_dataset_map(new_dir, key, self.datasets[key][0], self.datasets[key][1])
-
-        self.write_last_train_dataset_config()
+        #
+        # new_dir = os.path.join(self.output_path, "last_train_settings")
+        # for key in self.datasets:
+        #     write_dataset_map(new_dir, key, self.datasets[key][0], self.datasets[key][1])
+        #
+        # self.write_last_train_dataset_config()
 
 
 

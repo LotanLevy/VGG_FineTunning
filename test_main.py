@@ -36,11 +36,14 @@ def main():
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     network.load_model(args.ckpt_dir)
 
-    batch_x, batch_y = dataloader.read_batch(args.test_size, "test")
-    loss_func = tf.keras.losses.SparseCategoricalCrossentropy()
+    counter = 32
+    while counter < args.test_size:
 
-    loss, accuracy = traintest.get_accuracy_and_loss(batch_x, batch_y, network, loss_func)
-    print("loss: {}, accuracy: {}".format(loss, accuracy))
+        batch_x, batch_y = dataloader.read_batch(counter, "test")
+        loss_func = tf.keras.losses.SparseCategoricalCrossentropy()
+
+        loss, accuracy = traintest.get_accuracy_and_loss(batch_x, batch_y, network, loss_func)
+        print("loss: {}, accuracy: {}".format(loss, accuracy))
 
     hot_map_creator = traintest.HotMapHelper(network, args.input_size, loss_func)
     paths = dataloader.paths_logger

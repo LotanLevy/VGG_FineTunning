@@ -9,6 +9,8 @@ from Networks.TrainTestHelper import TrainTestHelper
 import argparse
 from traintest import train
 import random
+from tensorflow.python.keras.callbacks import ModelCheckpoint, EarlyStopping
+
 
 
 
@@ -37,6 +39,8 @@ def get_args():
     parser.add_argument('--cls_num', type=int, default=1000, help='The number of classes in the dataset')
     parser.add_argument('--input_size', type=int, nargs=2, default=(224, 224))
 
+    parser.add_argument('--ds_path', type=str, required=True)
+
     parser.add_argument('--train_path', type=str, required=True)
     parser.add_argument('--val_path', type=str, required=True)
     parser.add_argument('--test_path', type=str, required=True)
@@ -64,9 +68,28 @@ def main():
     if not os.path.exists(args.output_path):
         os.makedirs(args.output_path)
 
+    train_ds = tf.keras.preprocessing.image_dataset_from_directory(args.ds_path,
+                                                                   validation_split=0.2,
+                                                                   subset="training",
+                                                                   seed=123,
+                                                                   labels="inferred",
+                                                                   label_mode=int,
+                                                                   image_size=args.input_size,
+                                                                   batch_size=args.batch_size)
 
-    dataloader = DataLoader("dataloader", args.train_path, args.val_path, args.test_path, args.cls_num, args.input_size,
-                            output_path=args.output_path, restart_config_path=args.restart_dataloader_config)
+    val_ds = tf.keras.preprocessing.image_dataset_from_directory(args.ds_path,
+                                                                 validation_split=0.2,
+                                                                 subset="validation",
+                                                                 seed=123,
+                                                                 labels="inferred",
+                                                                 label_mode=int,
+                                                                 image_size=args.input_size,
+                                                                 batch_size=args.batch_size)
+
+
+
+    # dataloader = DataLoader("dataloader", args.train_path, args.val_path, args.test_path, args.cls_num, args.input_size,
+    #                         output_path=args.output_path, restart_config_path=args.restart_dataloader_config)
     network = nn_builder.get_network(args.nntype, args.cls_num, args.input_size)
     if args.restart_model_path is not None:
         network.load_model(args.restart_model_path)
@@ -75,20 +98,16 @@ def main():
     network.freeze_status()
     optimizer = tf.keras.optimizers.Adam(learning_rate=args.learning_rate1)
     loss = tf.keras.losses.SparseCategoricalCrossentropy()
-    trainer = TrainTestHelper(network, optimizer, loss, training=True)
-    validator = TrainTestHelper(network, optimizer, loss, training=False)
 
-    test_images, labels = dataloader.read_batch(200, "test")
-    save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "before_training", args.output_path)
+    network.compile(optimizer=optimizer, loss=loss, metrics=['accuracy'])
 
-    train(args.num_epochs, args.batch_size, trainer, validator, dataloader, args.print_freq, args.output_path, network)
+    checkpoint = ModelCheckpoint("vgg16_1.h5", monitor='val_acc', verbose=1, save_best_only=True,
+                                 save_weights_only=False, mode='auto', period=1)
+    early = EarlyStopping(monitor='val_acc', min_delta=0, patience=20, verbose=1, mode='auto')
+    hist = network.fit(train_ds, steps_per_epoch=100, validation_data=val_ds, validation_steps=10,
+                               epochs=100, callbacks=[checkpoint, early])
 
-
-    # train(dataloader, trainer, validator, args.batchs_num, args.train_iterations, args.print_freq)
-    save_predicted_results(test_images, labels, network, dataloader.paths_logger["test"], loss, "after_training", args.output_path)
-
-
-
+    
 
 if __name__ == "__main__":
     main()

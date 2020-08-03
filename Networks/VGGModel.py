@@ -12,19 +12,17 @@ class VGGModel(NNInterface):
     def __init__(self, classes_num, input_size):
         super().__init__(classes_num, input_size)
         self.output_path = None
-        vgg_conv = vgg16.VGG16(weights='imagenet', include_top=False, input_shape=(input_size[0], input_size[0], 3))
+        vgg_conv = vgg16.VGG16(weights=None, include_top=False, input_shape=(input_size[0], input_size[0], 3))
         vgg_conv.summary()
 
-        for layer in vgg_conv.layers[:]:
-            layer.trainable = False
+        # for layer in vgg_conv.layers[:]:
+        #     layer.trainable = False
 
         self.__model = tf.keras.Sequential()
         self.__model.add(vgg_conv)
         self.__model.add(tf.keras.layers.Flatten())
         self.__model.add(tf.keras.layers.Dense(4096, activation='relu'))
-        self.__model.add(tf.keras.layers.Dropout(0.5))
         self.__model.add(tf.keras.layers.Dense(4096, activation='relu'))
-        self.__model.add(tf.keras.layers.Dropout(0.5))
         self.__model.add(tf.keras.layers.Dense(classes_num, activation='softmax'))
 
         self.__model.summary()
